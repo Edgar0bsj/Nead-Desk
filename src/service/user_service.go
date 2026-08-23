@@ -19,7 +19,7 @@ func NewUserService(repository ports.UserStorage) *UserService {
 }
 
 // Validação pendente
-func (us *UserService) CreateUser(userDto *dto.CreateUserRequest) (*domain.User, error) {
+func (c *UserService) CreateUser(userDto *dto.CreateUserRequest) (*domain.User, error) {
 
 	pHash, err := bcrypt.GenerateFromPassword([]byte(userDto.Senha), bcrypt.DefaultCost)
 
@@ -27,7 +27,10 @@ func (us *UserService) CreateUser(userDto *dto.CreateUserRequest) (*domain.User,
 		return nil, err
 	}
 
-	cargo := domain.ParseCargo(userDto.Cargo)
+	cargo, err := domain.ParseCargo(userDto.Cargo)
+	if err != nil {
+		return nil, err
+	}
 
 	entity := domain.User{
 		ID:        uuid.New().String(),
@@ -40,16 +43,16 @@ func (us *UserService) CreateUser(userDto *dto.CreateUserRequest) (*domain.User,
 		UpdatedAt: time.Now(),
 	}
 
-	if err := us.repo.Save(&entity); err != nil {
+	if err := c.repo.Save(&entity); err != nil {
 		return nil, err
 	}
 
 	return &entity, nil
 }
 
-func (us *UserService) GetUserByID(id string) (*domain.User, error) {
+func (c *UserService) GetUserByID(id string) (*domain.User, error) {
 
-	return us.repo.FindByID(id)
+	return c.repo.FindByID(id)
 }
 
 func (us *UserService) GetAllUser() ([]*domain.User, error) {
@@ -64,7 +67,10 @@ func (us *UserService) UpdateUser(id string, userDto *dto.UpdateUserRequest) (*d
 	if err != nil {
 		return nil, err
 	}
-	cargo := domain.ParseCargo(userDto.Cargo)
+	cargo, err := domain.ParseCargo(userDto.Cargo)
+	if err != nil {
+		return nil, err
+	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(userDto.Senha), bcrypt.DefaultCost)
 	if err != nil {

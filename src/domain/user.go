@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -23,31 +24,29 @@ const (
 	Programador
 )
 
-func ParseCargo(value string) Cargo {
-	switch value {
-	case "Professor":
-		return Professor
-	case "Administrador":
-		return Administrador
-	case "Coordenador":
-		return Coordenador
-	case "Secretaria":
-		return Secretaria
-	case "Ti":
-		return Ti
-	case "Programador":
-		return Programador
-	default:
-		return 0
-	}
+var CargoStrings = [...]string{
+	"Professor",
+	"Administrador",
+	"Coordenador",
+	"Secretaria",
+	"Ti",
+	"Programador",
 }
 
 func (c Cargo) String() string {
-	cargos := [...]string{"Professor", "Administrador", "Coordenador", "Secretaria", "Ti", "Programador"}
-	if c < Professor || c > Programador {
-		return "Desconhecido"
+	if int(c) >= 0 || int(c) <= len(CargoStrings) {
+		return CargoStrings[int(c-1)]
 	}
-	return cargos[c]
+	return "Desconhecido"
+}
+
+func ParseCargo(value string) (Cargo, error) {
+	for i, v := range CargoStrings {
+		if v == value {
+			return Cargo(i + 1), nil
+		}
+	}
+	return 0, fmt.Errorf("Cargo inválido: %s", value)
 }
 
 // STRUCK USER

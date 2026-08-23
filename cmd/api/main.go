@@ -11,12 +11,15 @@ import (
 func main() {
 
 	userRepo := storage.NewUserMemoryStorage()
+	calledRepo := storage.NewCalledMemoryStorage()
 
 	userSvc := service.NewUserService(userRepo)
+	calledSvc := service.NewCalledService(calledRepo)
 
 	userHandler := handler.NewUserHandler(userSvc)
+	calledHandler := handler.NewCalledHandler(calledSvc)
 
-	r := router.SetupRouter(userHandler)
+	r := router.SetupRouter(userHandler, calledHandler)
 
 	log.Println("Server running on port 8080")
 	if err := r.Run(":8080"); err != nil {

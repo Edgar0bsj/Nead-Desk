@@ -10,18 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	service *service.UserService
+type CalledHandler struct {
+	service *service.CalledService
 }
 
-func NewUserHandler(service *service.UserService) *UserHandler {
-	return &UserHandler{
+func NewCalledHandler(service *service.CalledService) *CalledHandler {
+	return &CalledHandler{
 		service: service,
 	}
 }
 
-func (h *UserHandler) Create(c *gin.Context) {
-	var req dto.CreateUserRequest
+func (h *CalledHandler) Create(c *gin.Context) {
+	var req dto.CreateCalledRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -30,9 +30,15 @@ func (h *UserHandler) Create(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.CreateUser(&req)
+	called, err := h.service.CreateCalled(&req)
 	if err != nil {
-		if errors.Is(err, domain.ErrInvalidUser) {
+		if errors.Is(err, domain.ErrInvalidCalled) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		if errors.Is(err, domain.ErrCalledNotFound) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -45,17 +51,17 @@ func (h *UserHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	c.JSON(http.StatusCreated, called)
 }
 
-func (h *UserHandler) GetByID(c *gin.Context) {
-	id := c.Param("id") // :id da rota GET /todos/:id
+func (h *CalledHandler) GetByID(c *gin.Context) {
+	id := c.Param("id")
 
-	user, err := h.service.GetUserByID(id)
+	called, err := h.service.GetCalledByID(id)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		if errors.Is(err, domain.ErrCalledNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
+				"error": "Chamado não encontrado",
 			})
 			return
 		}
@@ -66,11 +72,11 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, called)
 }
 
-func (h *UserHandler) GetAll(c *gin.Context) {
-	users, err := h.service.GetAllUser()
+func (h *CalledHandler) GetAll(c *gin.Context) {
+	called, err := h.service.GetAllCalled()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erro do Servidor Interno",
@@ -78,13 +84,13 @@ func (h *UserHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, called)
 }
 
-func (h *UserHandler) Update(c *gin.Context) {
+func (h *CalledHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
-	var req dto.UpdateUserRequest
+	var req dto.UpdateCalledRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -93,16 +99,16 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.UpdateUser(id, &req)
+	called, err := h.service.UpdateCalled(id, &req)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		if errors.Is(err, domain.ErrCalledNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
+				"error": "Chamado não encontrada",
 			})
 			return
 		}
 
-		if errors.Is(err, domain.ErrInvalidUser) {
+		if errors.Is(err, domain.ErrInvalidCalled) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -115,17 +121,17 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, called)
 }
 
-func (h *UserHandler) Delete(c *gin.Context) {
+func (h *CalledHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
-	err := h.service.DeleteUser(id)
+	err := h.service.DeleteCalled(id)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
+		if errors.Is(err, domain.ErrCalledNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
+				"error": "Chamado não encontrado",
 			})
 			return
 		}
