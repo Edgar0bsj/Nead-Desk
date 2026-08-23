@@ -13,5 +13,4 @@ type UpdateUserRequest struct {
 	Cargo   string `json:"cargo"`
 	Unidade string `json:"unidade"`
 	Email   string `json:"email"`
-	Senha   string `json:"senha"`
 }

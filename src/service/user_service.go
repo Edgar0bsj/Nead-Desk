@@ -72,16 +72,10 @@ func (us *UserService) UpdateUser(id string, userDto *dto.UpdateUserRequest) (*d
 		return nil, err
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(userDto.Senha), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-
 	entity.Nome = userDto.Nome
 	entity.Cargo = cargo
 	entity.Unidade = userDto.Unidade
 	entity.Email = userDto.Email
-	entity.SenhaHash = string(hash)
 	entity.UpdatedAt = time.Now()
 
 	if err := us.repo.Update(entity); err != nil {
