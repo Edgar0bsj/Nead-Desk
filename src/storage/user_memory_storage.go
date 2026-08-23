@@ -3,36 +3,44 @@ package storage
 import (
 	"nead-desk/src/domain"
 	"sync"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
-// UserMemoryStorage persiste users em um map na memória do processo.
-//
-// Útil para estudo, protótipos e testes: zero configuração externa.
-// Os dados são perdidos ao reiniciar o servidor — comportamento esperado.
-//
-// UserMemoryStorage implementa userRepository implicitamente.
 type UserMemoryStorage struct {
-	// sync.RWMutex protege o map em acessos concorrentes.
-	// Leituras (RLock) podem ocorrer em paralelo; escritas (Lock) são exclusivas.
-	// Em APIs HTTP, várias goroutines (uma por requisição) acessam o storage
-	// simultaneamente — sem mutex, o map causaria race condition.
 	mu    sync.RWMutex
 	users map[string]*domain.User
 }
 
-// NewUserMemoryStorage é o construtor da implementação em memória.
-//
-// Convenção Go: funções New* retornam ponteiros quando a struct
-// será mutada ou compartilhada entre camadas.
 func NewUserMemoryStorage() *UserMemoryStorage {
+	teste := make(map[string]*domain.User)
+
+	senhaHash, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+
+	teste["cbebb439-80d8-4f4e-9b3c-f23abfa8b64c"] = &domain.User{
+		ID:        "cbebb439-80d8-4f4e-9b3c-f23abfa8b64c",
+		Nome:      "Desenvolvedor Master",
+		Cargo:     domain.Programador,
+		Unidade:   "Mesquita",
+		Email:     "edgar@email.com",
+		SenhaHash: string(senhaHash),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	// return &UserMemoryStorage{
+	// 	users: make(map[string]*domain.User),
+	// }
+
 	return &UserMemoryStorage{
-		users: make(map[string]*domain.User),
+		users: teste,
 	}
 }
 
 func (s *UserMemoryStorage) Save(user *domain.User) error {
 	s.mu.Lock()
-	defer s.mu.Unlock() // defer garante unlock mesmo se houver panic futuro
+	defer s.mu.Unlock()
 
 	s.users[user.ID] = user
 	return nil
@@ -43,8 +51,6 @@ func (s *UserMemoryStorage) FindByID(id string) (*domain.User, error) {
 	defer s.mu.RUnlock()
 
 	if user, exists := s.users[id]; exists {
-		// Retorna ponteiro para o user existente no map.
-		// Em produção com banco, aqui viria uma cópia ou nova alocação.
 		return user, nil
 	}
 
@@ -55,7 +61,6 @@ func (s *UserMemoryStorage) FindAll() ([]*domain.User, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	// Pré-aloca slice com capacidade = len(map) para evitar realocações.
 	users := make([]*domain.User, 0, len(s.users))
 
 	for _, user := range s.users {
@@ -87,4 +92,23 @@ func (s *UserMemoryStorage) Delete(id string) error {
 
 	delete(s.users, id)
 	return nil
+}
+
+func (s *UserMemoryStorage) FindByEmail(email string) (*domain.User, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	var index string
+
+	for i, v := range s.users {
+		if email != v.Email {
+			continue
+		}
+		index = i
+	}
+
+	if index == "" {
+		return nil, domain.ErrUserNotFound
+	}
+	return s.users[index], nil
 }

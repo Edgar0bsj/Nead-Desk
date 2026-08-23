@@ -21,6 +21,7 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Create(c *gin.Context) {
+
 	var req dto.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {

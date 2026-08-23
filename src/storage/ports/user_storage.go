@@ -8,4 +8,5 @@ type UserStorage interface {
 	FindByID(id string) (*domain.User, error)
 	Update(User *domain.User) error
 	Delete(id string) error
+	FindByEmail(email string) (*domain.User, error)
 }

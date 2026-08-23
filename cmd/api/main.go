@@ -18,8 +18,9 @@ func main() {
 
 	userHandler := handler.NewUserHandler(userSvc)
 	calledHandler := handler.NewCalledHandler(calledSvc)
+	authHandler := handler.NewAuthHandler(userRepo)
 
-	r := router.SetupRouter(userHandler, calledHandler)
+	r := router.SetupRouter(userHandler, calledHandler, authHandler)
 
 	log.Println("Server running on port 8080")
 	if err := r.Run(":8080"); err != nil {
