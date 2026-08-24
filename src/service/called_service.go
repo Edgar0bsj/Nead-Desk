@@ -18,7 +18,7 @@ func NewCalledService(repository ports.CalledStorage) *CalledService {
 }
 
 // Validação pendente
-func (c *CalledService) CreateCalled(calledDto *dto.CreateCalledRequest) (*domain.Called, error) {
+func (c *CalledService) CreateCalled(calledDto *dto.CreateCalledRequest, solicitanteID string) (*domain.Called, error) {
 
 	prioridade := domain.PrioridadeParse(calledDto.Prioridade)
 	if prioridade == 0 {
@@ -31,8 +31,7 @@ func (c *CalledService) CreateCalled(calledDto *dto.CreateCalledRequest) (*domai
 		Descricao:     calledDto.Descricao,
 		Status:        domain.Aberto,
 		Prioridade:    prioridade,
-		SolicitanteID: calledDto.SolicitanteID,
-		AtendenteID:   calledDto.AtendenteID,
+		SolicitanteID: solicitanteID,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -62,19 +61,15 @@ func (c *CalledService) UpdateCalled(id string, calledDto *dto.UpdateCalledReque
 		return nil, err
 	}
 
-	status := domain.StatusParse(calledDto.Status)
 	prioridade := domain.PrioridadeParse(calledDto.Prioridade)
-
-	if status == 0 || prioridade == 0 {
-		return nil, domain.ErrInvalidCalled
-	}
 
 	entity.Titulo = calledDto.Titulo
 	entity.Descricao = calledDto.Descricao
-	entity.Status = status
 	entity.Prioridade = prioridade
-	entity.SolicitanteID = calledDto.SolicitanteID
-	entity.AtendenteID = calledDto.AtendenteID
+	if entity.AtendenteID == "" {
+		entity.AtendenteID = calledDto.AtendenteID
+		entity.Status = domain.EmAtedimento
+	}
 	entity.UpdatedAt = time.Now()
 
 	if err := c.repo.Update(entity); err != nil {

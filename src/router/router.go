@@ -24,7 +24,11 @@ func SetupRouter(userHandler *handler.UserHandler, calledHandler *handler.Called
 			admin.GET("/user/:id", userHandler.GetByID)
 			admin.PUT("/user/:id", userHandler.Update)
 			admin.DELETE("/user/:id", userHandler.Delete)
+
 		}
+
+		// Pegar o chamado
+		v1.POST("/user/called/:id", calledHandler.AssigningCall)
 
 		// Called
 		v1.POST("/called", calledHandler.Create)

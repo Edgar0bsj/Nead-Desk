@@ -22,6 +22,7 @@ func NewCalledHandler(service *service.CalledService) *CalledHandler {
 
 func (h *CalledHandler) Create(c *gin.Context) {
 	var req dto.CreateCalledRequest
+	solicitante_id := c.GetString("user_id")
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -30,7 +31,7 @@ func (h *CalledHandler) Create(c *gin.Context) {
 		return
 	}
 
-	called, err := h.service.CreateCalled(&req)
+	called, err := h.service.CreateCalled(&req, solicitante_id)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidCalled) {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -143,4 +144,32 @@ func (h *CalledHandler) Delete(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func (h *CalledHandler) AssigningCall(c *gin.Context) {
+	id := c.Param("id")
+	user_id := c.GetString("user_id")
+
+	called, err := h.service.GetCalledByID(id)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Chamado não encontrado"})
+		return
+	}
+
+	called_dto := dto.UpdateCalledRequest{
+		Titulo:      called.Titulo,
+		Descricao:   called.Descricao,
+		Prioridade:  called.Prioridade.String(),
+		AtendenteID: user_id,
+	}
+
+	called_entity, err := h.service.UpdateCalled(called.ID, &called_dto)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Erro ao salvar no banco de dados"})
+		return
+	}
+
+	c.JSON(http.StatusOK, called_entity)
 }

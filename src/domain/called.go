@@ -40,6 +40,20 @@ const (
 	Critica
 )
 
+func (p Prioridade) String() string {
+	prioridadeStrings := [...]string{
+		"Baixa",
+		"Media",
+		"Alta",
+		"Critica",
+	}
+	if int(p) > 0 && int(p) <= len(prioridadeStrings) {
+		return prioridadeStrings[int(p)-1]
+	}
+
+	return "Desconhecido"
+}
+
 func PrioridadeParse(value string) Prioridade {
 	switch value {
 	case "Baixa":
