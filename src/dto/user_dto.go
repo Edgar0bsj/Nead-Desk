@@ -1,16 +1,24 @@
 package dto
 
+import (
+	"nead-desk/src/domain"
+)
+
+type UserAuth struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type CreateUserRequest struct {
-	Nome    string `json:"nome"`
-	Cargo   string `json:"cargo"`
-	Unidade string `json:"unidade"`
-	Email   string `json:"email"`
-	Senha   string `json:"senha"`
+	Nome     string          `json:"nome"`
+	Email    string          `json:"email"`
+	Password string          `json:"password"`
+	Role     domain.UserRole `json:"role"`
 }
 
 type UpdateUserRequest struct {
-	Nome    string `json:"nome"`
-	Cargo   string `json:"cargo"`
-	Unidade string `json:"unidade"`
-	Email   string `json:"email"`
+	Nome     string          `json:"nome"`
+	Email    string          `json:"email"`
+	Password string          `json:"password"`
+	Role     domain.UserRole `json:"role"`
 }

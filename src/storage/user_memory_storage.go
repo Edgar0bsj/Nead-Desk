@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -14,28 +15,28 @@ type UserMemoryStorage struct {
 }
 
 func NewUserMemoryStorage() *UserMemoryStorage {
-	teste := make(map[string]*domain.User)
-
-	senhaHash, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-
-	teste["cbebb439-80d8-4f4e-9b3c-f23abfa8b64c"] = &domain.User{
-		ID:        "cbebb439-80d8-4f4e-9b3c-f23abfa8b64c",
-		Nome:      "Desenvolvedor Master",
-		Cargo:     domain.Programador,
-		Unidade:   "Mesquita",
-		Email:     "edgar@email.com",
-		SenhaHash: string(senhaHash),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+	db := make(map[string]*domain.User)
+	passHash, err := bcrypt.GenerateFromPassword([]byte("654321"), bcrypt.DefaultCost)
+	if err != nil {
+		return nil
 	}
 
-	// return &UserMemoryStorage{
-	// 	users: make(map[string]*domain.User),
-	// }
+	teste := domain.User{
+		ID:            uuid.New().String(),
+		Nome:          "Edgar",
+		Email:         "Edgar@email.com",
+		Password_hash: string(passHash),
+		Role:          domain.RoleAdmin,
+		Created_at:    time.Now(),
+		Updated_at:    time.Now(),
+	}
+	db[teste.ID] = &teste
 
 	return &UserMemoryStorage{
-		users: teste,
+		users: db,
+		// users: make(map[string]*domain.User),
 	}
+
 }
 
 func (s *UserMemoryStorage) Save(user *domain.User) error {

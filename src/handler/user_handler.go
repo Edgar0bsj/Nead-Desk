@@ -6,8 +6,11 @@ import (
 	"nead-desk/src/dto"
 	"nead-desk/src/service"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
@@ -20,72 +23,9 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 	}
 }
 
-func (h *UserHandler) Create(c *gin.Context) {
+func (h *UserHandler) UserAuth(c *gin.Context) {
 
-	var req dto.CreateUserRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "corpo da solicitação inválido",
-		})
-		return
-	}
-
-	user, err := h.service.CreateUser(&req)
-	if err != nil {
-		if errors.Is(err, domain.ErrInvalidUser) {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro do Servidor Interno",
-		})
-		return
-	}
-
-	c.JSON(http.StatusCreated, user)
-}
-
-func (h *UserHandler) GetByID(c *gin.Context) {
-	id := c.Param("id") // :id da rota GET /todos/:id
-
-	user, err := h.service.GetUserByID(id)
-	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
-			})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro do Servidor Interno",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, user)
-}
-
-func (h *UserHandler) GetAll(c *gin.Context) {
-	users, err := h.service.GetAllUser()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro do Servidor Interno",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, users)
-}
-
-func (h *UserHandler) Update(c *gin.Context) {
-	id := c.Param("id")
-
-	var req dto.UpdateUserRequest
+	var req dto.UserAuth
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -94,48 +34,40 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.UpdateUser(id, &req)
+	//Buscar usuario
+	user, err := h.service.FindUserByEmail(req.Email)
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
-			})
-			return
-		}
-
 		if errors.Is(err, domain.ErrInvalidUser) {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
+				"error": "Usuario Inválido",
 			})
 			return
 		}
+	}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro do Servidor Interno",
+	//Comparar hash da senha
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password_hash), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Email ou Senha incorreto",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
-}
+	//Gerar o token
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"cargo":   user.Role,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // expira em 24h
+	}
 
-func (h *UserHandler) Delete(c *gin.Context) {
-	id := c.Param("id")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	err := h.service.DeleteUser(id)
+	//Lembrar de trocar a secret ^,^
+	assinaturaToken, err := token.SignedString([]byte("nead_desk_secret"))
+
 	if err != nil {
-		if errors.Is(err, domain.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Usuario não encontrada",
-			})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erro do Servidor Interno",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error ao Gerar token"})
 		return
 	}
-
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusCreated, gin.H{"access_token": assinaturaToken, "token_type": "Bearer"})
 }

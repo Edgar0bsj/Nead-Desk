@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -12,51 +11,27 @@ var (
 	ErrInvalidUser  = errors.New("Dados do Usuario invalido")
 )
 
-// ENUM CARGO
-type Cargo int
+type UserRole string
 
 const (
-	Professor Cargo = iota + 1
-	Administrador
-	Coordenador
-	Secretaria
-	Ti
-	Programador
+	RoleUser  UserRole = "user"
+	RoleAdmin UserRole = "admin"
 )
 
-var CargoStrings = [...]string{
-	"Professor",
-	"Administrador",
-	"Coordenador",
-	"Secretaria",
-	"Ti",
-	"Programador",
-}
-
-func (c Cargo) String() string {
-	if int(c) >= 0 || int(c) <= len(CargoStrings) {
-		return CargoStrings[int(c-1)]
+func (u UserRole) IsValid() bool {
+	if u == RoleAdmin || u == RoleUser {
+		return true
 	}
-	return "Desconhecido"
-}
-
-func ParseCargo(value string) (Cargo, error) {
-	for i, v := range CargoStrings {
-		if v == value {
-			return Cargo(i + 1), nil
-		}
-	}
-	return 0, fmt.Errorf("Cargo inválido: %s", value)
+	return false
 }
 
 // STRUCK USER
 type User struct {
-	ID        string    `json:"id"`
-	Nome      string    `json:"nome"`
-	Cargo     Cargo     `json:"cargo"`
-	Unidade   string    `json:"unidade"`
-	Email     string    `json:"email"`
-	SenhaHash string    `json:"senha"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID            string    `json:"id"`
+	Nome          string    `json:"nome"`
+	Email         string    `json:"email"`
+	Password_hash string    `json:"password_hash"`
+	Role          UserRole  `json:"role"`
+	Created_at    time.Time `json:"created_at"`
+	Updated_at    time.Time `json:"updated_at"`
 }
