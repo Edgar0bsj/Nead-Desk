@@ -23,7 +23,7 @@ func NewUserMemoryStorage() *UserMemoryStorage {
 
 	teste := domain.User{
 		ID:            uuid.New().String(),
-		Nome:          "Edgar",
+		Name:          "Edgar",
 		Email:         "Edgar@email.com",
 		Password_hash: string(passHash),
 		Role:          domain.RoleAdmin,

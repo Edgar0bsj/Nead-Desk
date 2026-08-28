@@ -137,6 +137,50 @@
 
 ---
 
+## Rota: Usuários criação
+
+### `POST /auth/register`
+
+- **Descrição:** Criar uma nova conta de usuário.
+- **Acesso:** `ADMIN`.
+
+---
+
+### Requisição
+
+**Headers Necessários:**
+
+- `Content-Type: application/json`
+- `Authorization: Token Bearer`
+
+**Corpo da Requisição (JSON):**
+
+```json
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "password": "123456"
+}
+```
+
+---
+
+### Response
+
+#### `201 Created` - Sucesso
+
+```json
+{
+  "id": "12345678-abcd-4567-8901-123456789abc",
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "role": "user",
+  "created_at": "2026-08-25T20:00:00-03:00"
+}
+```
+
+---
+
 ## Autor
 
 <table>

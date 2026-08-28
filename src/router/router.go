@@ -2,6 +2,7 @@ package router
 
 import (
 	"nead-desk/src/handler"
+	"nead-desk/src/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,13 +10,11 @@ import (
 func SetupRouter(userHandler *handler.UserHandler) *gin.Engine {
 	r := gin.Default()
 
-	r.POST("/auth/login", userHandler.UserAuth)
-
-	// v1 := r.Group("/api/v1")
-	// v1.Use(middleware.AuthMiddleware())
-	// {
-
-	// }
+	authRoutes := r.Group("/auth")
+	{
+		authRoutes.POST("/login", userHandler.UserAuthLogin)
+		authRoutes.POST("/register", middleware.AuthMiddleware(), middleware.AdminMiddle(), userHandler.UserAuthRegister)
+	}
 
 	return r
 }

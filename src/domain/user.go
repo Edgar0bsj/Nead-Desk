@@ -9,6 +9,7 @@ import (
 var (
 	ErrUserNotFound = errors.New("Usuario Não Encontrado")
 	ErrInvalidUser  = errors.New("Dados do Usuario invalido")
+	ErrSaveFailed   = errors.New("Error ao Persistir dados do Usuario")
 )
 
 type UserRole string
@@ -28,7 +29,7 @@ func (u UserRole) IsValid() bool {
 // STRUCK USER
 type User struct {
 	ID            string    `json:"id"`
-	Nome          string    `json:"nome"`
+	Name          string    `json:"name"`
 	Email         string    `json:"email"`
 	Password_hash string    `json:"password_hash"`
 	Role          UserRole  `json:"role"`
