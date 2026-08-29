@@ -27,7 +27,7 @@ func (h *CategoriesHandler) HandlerCreateCategories(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "corpo da solicitação inválido",
+			"error": "Invalid request body",
 		})
 		return
 	}
@@ -48,7 +48,7 @@ func (h *CategoriesHandler) HandlerCreateCategories(c *gin.Context) {
 	// verificar duplicidade
 	if exist := h.svc.ExisteCategoriName(req.Name); exist {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": "O nome da categoria já existe!",
+			"Error": "The category name already exists!",
 		})
 		return
 	}
@@ -58,7 +58,7 @@ func (h *CategoriesHandler) HandlerCreateCategories(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": "Error ao salvar Categoria !",
+			"Error": "Error saving Category!",
 		})
 		return
 	}
@@ -91,12 +91,12 @@ func (h *CategoriesHandler) HandlerListAllCategores(c *gin.Context) {
 }
 
 func (h *CategoriesHandler) HandlerUpdateCategores(c *gin.Context) {
-	categoriId := c.Param("id")
+	categoryId := c.Param("id")
 	validate := validator.New()
 	var req dto.UpdateCategorieDto
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Corpo da requisição inválida!"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body!"})
 		return
 	}
 	// Validação
@@ -105,11 +105,11 @@ func (h *CategoriesHandler) HandlerUpdateCategores(c *gin.Context) {
 		return
 	}
 
-	result, err := h.svc.UpdateCategories(categoriId, &req)
+	result, err := h.svc.UpdateCategories(categoryId, &req)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Error na atualização da entidade",
+			"error": "Error updating the entity",
 		})
 		return
 	}
@@ -121,4 +121,29 @@ func (h *CategoriesHandler) HandlerUpdateCategores(c *gin.Context) {
 		"is_active":   result.Is_active,
 		"updated_at":  result.Updated_at,
 	})
+}
+
+func (h *CategoriesHandler) HandlerDisableCategory(c *gin.Context) {
+	categoryId := c.Param("id")
+
+	result, err := h.svc.DisableCategory(categoryId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Category not found!",
+		})
+		return
+	}
+
+	if result {
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "category activated successfully",
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "category deactivated successfully",
+	})
+
 }

@@ -122,3 +122,41 @@
   "updated_at": "2026-08-25T21:35:00-03:00"
 }
 ```
+
+---
+
+### `DELETE /admin/categories/:id`
+
+- **Descrição:** Desativar categoria.
+- **Acesso:** `ADMIN`.
+
+---
+
+### Requisição
+
+**Headers Necessários:**
+
+- `Content-Type: application/json`
+- `Authorization: Token Bearer`
+
+**Corpo da Requisição (JSON):**
+
+- `Body: Vazio`
+
+---
+
+### Response happy
+
+#### `200 Ok` - Sucesso
+
+```json
+{
+  "message": "category deactivated successfully"
+}
+```
+
+```json
+{
+  "message": "category activated successfully"
+}
+```

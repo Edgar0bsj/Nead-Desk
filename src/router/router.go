@@ -21,6 +21,7 @@ func SetupRouter(userHandler *handler.UserHandler, categoriHandler *handler.Cate
 		adminRoutes.POST("/categories", categoriHandler.HandlerCreateCategories)
 		adminRoutes.GET("/categories", categoriHandler.HandlerListAllCategores)
 		adminRoutes.PATCH("/categories/:id", categoriHandler.HandlerUpdateCategores)
+		adminRoutes.DELETE("/categories/:id", categoriHandler.HandlerDisableCategory)
 	}
 
 	return r

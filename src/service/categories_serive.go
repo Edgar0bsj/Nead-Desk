@@ -79,3 +79,18 @@ func (c *CategoriesService) DeleteCategories(id string) error {
 func (c *CategoriesService) ExisteCategoriName(name string) bool {
 	return c.repo.ExistName(name)
 }
+
+func (c *CategoriesService) DisableCategory(id string) (bool, error) {
+	categori, err := c.repo.FindByID(id)
+
+	if err != nil {
+		return false, err
+	}
+
+	categori.Is_active = !categori.Is_active
+	if err := c.repo.Update(categori); err != nil {
+		return false, err
+	}
+
+	return categori.Is_active, nil
+}
