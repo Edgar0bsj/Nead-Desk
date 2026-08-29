@@ -39,7 +39,7 @@ func (c *UserService) CreateUser(userDto *dto.UserAuthRegisterDto) (*domain.User
 		Updated_at:    time.Now(),
 	}
 	if err := c.repo.Save(&entity); err != nil {
-		return nil, domain.ErrSaveFailed
+		return nil, domain.ErrSaveFailedUser
 	}
 
 	return &entity, nil

@@ -7,9 +7,9 @@ import (
 
 // ERROS
 var (
-	ErrUserNotFound = errors.New("Usuario Não Encontrado")
-	ErrInvalidUser  = errors.New("Dados do Usuario invalido")
-	ErrSaveFailed   = errors.New("Error ao Persistir dados do Usuario")
+	ErrUserNotFound   = errors.New("Usuario Não Encontrado")
+	ErrInvalidUser    = errors.New("Dados do Usuario invalido")
+	ErrSaveFailedUser = errors.New("Error ao Persistir dados do Usuario")
 )
 
 type UserRole string

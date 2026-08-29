@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserMiddle() gin.HandlerFunc {
+func AuthAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		userRole, exists := c.Get("user_role")
@@ -19,8 +19,8 @@ func UserMiddle() gin.HandlerFunc {
 			return
 		}
 
-		// Somente acesso User
-		if userRole == string(domain.RoleUser) {
+		// Somente acesso Admin
+		if userRole == string(domain.RoleAdmin) {
 			c.Next()
 			return
 		}

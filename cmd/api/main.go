@@ -10,11 +10,17 @@ import (
 
 func main() {
 
+	// User
 	userStorage := storage.NewUserMemoryStorage()
 	userService := service.NewUserService(userStorage)
 	userHandler := handler.NewUserHandler(userService)
 
-	r := router.SetupRouter(userHandler)
+	// Categories
+	categoStorage := storage.NewCategoriesMemoryStorage()
+	categoService := service.NewCategoriesService(categoStorage)
+	categoHandler := handler.NewCategoriesHandler(categoService)
+
+	r := router.SetupRouter(userHandler, categoHandler)
 
 	log.Println("Server running on port 8080")
 	if err := r.Run(":8080"); err != nil {
