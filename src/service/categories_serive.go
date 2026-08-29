@@ -52,11 +52,11 @@ func (c *CategoriesService) FindByIdCategories(id string) (*domain.Categories, e
 
 }
 
-func (c *CategoriesService) UpdateCategories(id string, cateDto *dto.UpdateCategorieDto) error {
+func (c *CategoriesService) UpdateCategories(id string, cateDto *dto.UpdateCategorieDto) (*domain.Categories, error) {
 
 	entity, err := c.repo.FindByID(id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	entity.Name = cateDto.Name
@@ -64,9 +64,9 @@ func (c *CategoriesService) UpdateCategories(id string, cateDto *dto.UpdateCateg
 	entity.Updated_at = time.Now()
 
 	if err := c.repo.Update(entity); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return entity, nil
 }
 
 func (c *CategoriesService) DeleteCategories(id string) error {

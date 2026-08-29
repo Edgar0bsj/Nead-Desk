@@ -67,7 +67,6 @@
 
 ```json
 {
-  "data": [
     {
       "id": "377aa3e8-79d5-4402-9086-a1dccaee78ff",
       "name": "Acesso",
@@ -80,6 +79,46 @@
       "description": "Problemas relacionados aos equipamentos.",
       "is_active": true
     }
-  ]
+}
+```
+
+---
+
+### `PATCH /admin/categories/:id`
+
+- **Descrição:** Editar categoria.
+- **Acesso:** `ADMIN`.
+
+---
+
+### Requisição
+
+**Headers Necessários:**
+
+- `Content-Type: application/json`
+- `Authorization: Token Bearer`
+
+**Corpo da Requisição (JSON):**
+
+```json
+{
+  "name": "Infraestrutura",
+  "description": "Problemas de infraestrutura."
+}
+```
+
+---
+
+### Response happy
+
+#### `200 Ok` - Sucesso
+
+```json
+{
+  "id": "ad2bec2e-05e3-4f49-b8b8-89c4bb74e051",
+  "name": "Infraestrutura",
+  "description": "Problemas de infraestrutura.",
+  "is_active": true,
+  "updated_at": "2026-08-25T21:35:00-03:00"
 }
 ```

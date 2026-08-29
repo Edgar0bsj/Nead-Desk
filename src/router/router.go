@@ -19,6 +19,8 @@ func SetupRouter(userHandler *handler.UserHandler, categoriHandler *handler.Cate
 	adminRoutes := r.Group("/admin", middleware.AuthRequired(), middleware.AuthAdmin())
 	{
 		adminRoutes.POST("/categories", categoriHandler.HandlerCreateCategories)
+		adminRoutes.GET("/categories", categoriHandler.HandlerListAllCategores)
+		adminRoutes.PATCH("/categories/:id", categoriHandler.HandlerUpdateCategores)
 	}
 
 	return r

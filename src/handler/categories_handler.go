@@ -5,6 +5,7 @@ import (
 	"nead-desk/src/dto"
 	"nead-desk/src/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -68,5 +69,56 @@ func (h *CategoriesHandler) HandlerCreateCategories(c *gin.Context) {
 		"description": categorie.Description,
 		"is_active":   categorie.Is_active,
 		"created_at":  categorie.Created_at,
+	})
+}
+
+func (h *CategoriesHandler) HandlerListAllCategores(c *gin.Context) {
+	categories := h.svc.FindAllCategories()
+
+	var data []map[string]string
+
+	for _, v := range categories {
+		data = append(data, map[string]string{
+			"id":          v.ID,
+			"name":        v.Name,
+			"description": v.Description,
+			"is_active":   strconv.FormatBool(v.Is_active),
+		})
+
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
+func (h *CategoriesHandler) HandlerUpdateCategores(c *gin.Context) {
+	categoriId := c.Param("id")
+	validate := validator.New()
+	var req dto.UpdateCategorieDto
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Corpo da requisição inválida!"})
+		return
+	}
+	// Validação
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	result, err := h.svc.UpdateCategories(categoriId, &req)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Error na atualização da entidade",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":          result.ID,
+		"name":        result.Name,
+		"description": result.Description,
+		"is_active":   result.Is_active,
+		"updated_at":  result.Updated_at,
 	})
 }
