@@ -10,16 +10,9 @@ type UserAuthLoginDto struct {
 }
 
 type UserAuthRegisterDto struct {
-	Name     string `validate:"required,min=3"`
+	Name     string `validate:"required,min=3,max=50"`
 	Email    string `validate:"required,email"`
-	Password string `validate:"required,min=6"`
-}
-
-type CreateUserRequest struct {
-	Name     string          `json:"name"`
-	Email    string          `json:"email"`
-	Password string          `json:"password"`
-	Role     domain.UserRole `json:"role"`
+	Password string `validate:"required,min=6,max=25"`
 }
 
 type UpdateUserRequest struct {
@@ -27,4 +20,9 @@ type UpdateUserRequest struct {
 	Email    string          `json:"email"`
 	Password string          `json:"password"`
 	Role     domain.UserRole `json:"role"`
+}
+
+type UserChangeResponseDto struct {
+	Name string `validate:"required,min=3,max=50"`
+	Role string `validate:"required,oneof=user admin"`
 }

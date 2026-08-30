@@ -44,3 +44,35 @@ func (c *UserService) CreateUser(userDto *dto.UserAuthRegisterDto) (*domain.User
 
 	return &entity, nil
 }
+
+func (c *UserService) FindAllUser() []*domain.User {
+	users, _ := c.repo.FindAll()
+
+	return users
+}
+
+func (c *UserService) FindByIdUser(id string) (*domain.User, error) {
+	user, err := c.repo.FindByID(id)
+
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (c *UserService) ChangeUser(id string, userDto *dto.UserChangeResponseDto) (*domain.User, error) {
+	user, err := c.repo.FindByID(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user.Name = userDto.Name
+	user.Role = domain.UserRole(userDto.Role)
+
+	if err := c.repo.Update(user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

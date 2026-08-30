@@ -140,3 +140,84 @@ func (h *UserHandler) UserAuthRegister(c *gin.Context) {
 		"created_at": userEntity.Created_at,
 	})
 }
+
+// ======================================
+// Find All Users
+// ======================================
+func (h *UserHandler) HandlerFindAllUsers(c *gin.Context) {
+	var response []map[string]interface{}
+
+	users := h.service.FindAllUser()
+
+	for _, v := range users {
+		response = append(response, map[string]interface{}{
+			"id":         v.ID,
+			"name":       v.Name,
+			"email":      v.Email,
+			"role":       v.Role,
+			"created_at": v.Created_at,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// ======================================
+// Find By Id User
+// ======================================
+func (h *UserHandler) HandlerFindByIdUser(c *gin.Context) {
+	userId := c.Param("id")
+
+	users, err := h.service.FindByIdUser(userId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"id":         users.ID,
+		"name":       users.Name,
+		"email":      users.Email,
+		"role":       users.Role,
+		"created_at": users.Created_at,
+		"updated_at": users.Updated_at,
+	})
+}
+
+// ======================================
+// Change User
+// ======================================
+func (h *UserHandler) HandlerChangeUser(c *gin.Context) {
+	var req dto.UserChangeResponseDto
+	validate := validator.New()
+	userId := c.Param("id")
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error in the request body"})
+		return
+	}
+
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"validation error": err.Error()})
+		return
+	}
+
+	users, err := h.service.ChangeUser(userId, &req)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"id":         users.ID,
+		"name":       users.Name,
+		"email":      users.Email,
+		"role":       users.Role,
+		"updated_at": users.Updated_at,
+	})
+}

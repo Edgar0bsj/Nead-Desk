@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthUser() gin.HandlerFunc {
+func AuthDefault() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		userRole, exists := c.Get("user_role")
@@ -19,8 +19,8 @@ func AuthUser() gin.HandlerFunc {
 			return
 		}
 
-		// Somente acesso User
-		if userRole == string(domain.RoleUser) {
+		// Só precisa esta autenticado
+		if userRole == string(domain.RoleUser) || userRole == string(domain.RoleAdmin) {
 			c.Next()
 			return
 		}
